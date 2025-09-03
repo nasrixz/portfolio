@@ -163,7 +163,7 @@ function rotateRoles() {
             // Update first role badge with animation
             roleBadges[0].style.opacity = '0';
             setTimeout(() => {
-                const icons = ['fa-laptop-code', 'fa-flutter', 'fa-server'];
+                const icons = ['fa-laptop-code', 'fa-flutter', 'fa-server', 'fa-paint-brush'];
                 roleBadges[0].innerHTML = `<i class="fas ${icons[roleIndex]}"></i> ${roles[roleIndex]}`;
                 roleBadges[0].style.opacity = '1';
             }, 300);
