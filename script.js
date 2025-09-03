@@ -4,6 +4,10 @@
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
 
+(function () {
+    emailjs.init({ publicKey: "dOWWXZuzhW8_kDpHH" });
+})();
+
 if (hamburger && navMenu) {
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
@@ -74,39 +78,51 @@ revealElements(); // Initial check on page load
 // Form submission handler
 function handleSubmit(event) {
     event.preventDefault();
-    
-    // Get form data
-    const formData = new FormData(event.target);
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    // Honeypot (optional): stop bots
+    if (formData.get('website')) return;
+
     const name = formData.get('name');
     const email = formData.get('email');
     const message = formData.get('message');
-    
-    // Validate form data
+
     if (!name || !email || !message) {
         alert('Please fill in all required fields.');
         return;
     }
-    
-    // Show success message
-    alert(`Thank you ${name}! Your message has been received. I'll get back to you at ${email} soon.`);
-    
-    // Reset form
-    event.target.reset();
-    
-    // Optional: Add form submission logic here
-    console.log('Form submitted:', { name, email, message });
+
+    // Map to your template variables
+    const params = {
+        from_name: name,
+        from_email: email,
+        message: message
+    };
+
+    emailjs
+        .send("service_59q6mpn", "template_6u37d8z", params)
+        .then(() => {
+            alert(`✅ Thank you ${name}! Your message has been sent.`);
+            form.reset();
+        })
+        .catch((err) => {
+            console.error("EmailJS error:", err);
+            alert("❌ Could not send email. Please try again later.");
+        });
 }
 
 // Counter animation for statistics
 function animateCounters() {
     const counters = document.querySelectorAll('.stat-number');
-    
+
     counters.forEach(counter => {
         const target = parseInt(counter.getAttribute('data-target'));
         const duration = 2000; // 2 seconds
         const increment = target / (duration / 16); // 60fps
         let current = 0;
-        
+
         const updateCounter = () => {
             if (current < target) {
                 current += increment;
@@ -116,7 +132,7 @@ function animateCounters() {
                 counter.textContent = target + '+';
             }
         };
-        
+
         // Observe when the counter comes into view
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -127,7 +143,7 @@ function animateCounters() {
                 }
             });
         }, { threshold: 0.5 });
-        
+
         observer.observe(counter);
     });
 }
@@ -167,7 +183,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             e.preventDefault();
             const target = document.querySelector(href);
             const offsetTop = target.offsetTop - 80; // Account for fixed navbar
-            
+
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth'
@@ -181,7 +197,7 @@ window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
     const hero = document.querySelector('.hero');
     const heroContent = document.querySelector('.hero-container');
-    
+
     if (hero && heroContent && scrolled < window.innerHeight) {
         const rate = scrolled * -0.5;
         heroContent.style.transform = `translateY(${rate}px)`;
@@ -195,7 +211,7 @@ function highlightRandomSkill() {
         setInterval(() => {
             // Remove previous highlight
             skills.forEach(skill => skill.classList.remove('highlighted'));
-            
+
             // Add new highlight
             const randomIndex = Math.floor(Math.random() * skills.length);
             skills[randomIndex].classList.add('highlighted');
@@ -228,7 +244,7 @@ function typeWriter() {
         const text = originalText.replace(iconHTML, '');
         element.innerHTML = iconHTML;
         let index = 0;
-        
+
         function type() {
             if (index < text.length) {
                 element.innerHTML = iconHTML + text.substring(0, index + 1);
@@ -236,7 +252,7 @@ function typeWriter() {
                 setTimeout(type, 50);
             }
         }
-        
+
         setTimeout(type, 500);
     }
 }
@@ -248,14 +264,14 @@ window.addEventListener('load', () => {
 
 // Add loading animation for images
 document.querySelectorAll('img').forEach(img => {
-    img.addEventListener('load', function() {
+    img.addEventListener('load', function () {
         this.style.opacity = '1';
     });
-    
+
     // Set initial opacity and transition
     img.style.opacity = '0';
     img.style.transition = 'opacity 0.5s ease';
-    
+
     // If image is already cached and loaded
     if (img.complete) {
         img.style.opacity = '1';
@@ -264,12 +280,12 @@ document.querySelectorAll('img').forEach(img => {
 
 // Project card hover effects
 document.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
+    card.addEventListener('mouseenter', function () {
         this.style.transform = 'translateY(-10px)';
         this.style.boxShadow = '0 20px 40px rgba(0, 212, 255, 0.3)';
     });
-    
-    card.addEventListener('mouseleave', function() {
+
+    card.addEventListener('mouseleave', function () {
         this.style.transform = 'translateY(0)';
         this.style.boxShadow = '';
     });
@@ -315,20 +331,20 @@ const formInputs = document.querySelectorAll('.form-input, .form-textarea');
 // Add floating label effect
 formInputs.forEach(input => {
     // Focus and blur effects
-    input.addEventListener('focus', function() {
+    input.addEventListener('focus', function () {
         this.style.borderColor = 'var(--accent-primary)';
         this.style.background = 'rgba(0, 212, 255, 0.05)';
     });
-    
-    input.addEventListener('blur', function() {
+
+    input.addEventListener('blur', function () {
         if (!this.value) {
             this.style.borderColor = 'var(--border)';
             this.style.background = 'var(--dark-secondary)';
         }
     });
-    
+
     // Real-time validation
-    input.addEventListener('input', function() {
+    input.addEventListener('input', function () {
         if (this.type === 'email') {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (this.value && !emailRegex.test(this.value)) {
@@ -347,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         revealElements();
         animateCounters();
     }, 100);
-    
+
     // Add loaded class to body for CSS animations
     setTimeout(() => {
         document.body.classList.add('loaded');
@@ -358,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let scrollTimeout;
 function throttleScroll(callback, delay) {
     if (scrollTimeout) return;
-    
+
     scrollTimeout = setTimeout(() => {
         callback();
         scrollTimeout = null;
@@ -392,13 +408,13 @@ document.querySelectorAll('.reveal').forEach(el => {
 });
 
 // Console greeting
-console.log('%c👋 Hello! Thanks for checking out my portfolio!', 
+console.log('%c👋 Hello! Thanks for checking out my portfolio!',
     'color: #00d4ff; font-size: 20px; font-weight: bold; padding: 10px;');
-console.log('%c💼 Looking for a skilled developer? Let\'s connect!', 
+console.log('%c💼 Looking for a skilled developer? Let\'s connect!',
     'color: #4ade80; font-size: 16px; padding: 5px;');
-console.log('%c📧 Email: nasrirusni1@gmail.com', 
+console.log('%c📧 Email: nasrirusni1@gmail.com',
     'color: #fbbf24; font-size: 14px; padding: 5px;');
-console.log('%c📱 Phone: +6012-8221068', 
+console.log('%c📱 Phone: +6012-8221068',
     'color: #fbbf24; font-size: 14px; padding: 5px;');
 
 // Service Worker registration for better performance (optional)
@@ -414,53 +430,53 @@ function validateForm(formData) {
     const name = formData.get('name');
     const email = formData.get('email');
     const message = formData.get('message');
-    
+
     const errors = [];
-    
+
     if (!name || name.trim().length < 2) {
         errors.push('Please enter a valid name (at least 2 characters)');
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
         errors.push('Please enter a valid email address');
     }
-    
+
     if (!message || message.trim().length < 10) {
         errors.push('Please enter a message (at least 10 characters)');
     }
-    
+
     return errors;
 }
 
 // Enhanced form submission
 if (contactForm) {
-    contactForm.addEventListener('submit', function(event) {
+    contactForm.addEventListener('submit', function (event) {
         event.preventDefault();
-        
+
         const formData = new FormData(this);
         const errors = validateForm(formData);
-        
+
         if (errors.length > 0) {
             alert('Please fix the following errors:\n' + errors.join('\n'));
             return;
         }
-        
+
         // Show loading state
         const submitBtn = this.querySelector('.form-submit');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
-        
+
         // Simulate form submission (replace with actual submission logic)
         setTimeout(() => {
             alert('Thank you! Your message has been sent successfully.');
             this.reset();
-            
+
             // Reset button
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-            
+
             // Reset form input styles
             formInputs.forEach(input => {
                 input.style.borderColor = 'var(--border)';
