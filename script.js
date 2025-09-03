@@ -152,7 +152,7 @@ function animateCounters() {
 animateCounters();
 
 // Role rotation effect
-const roles = ['Software Developer', 'Flutter Expert', 'Full-Stack Engineer'];
+const roles = ['Software Developer', 'Flutter Programmer', 'Full-Stack Developer', 'UIX/UX Designer'];
 let roleIndex = 0;
 
 function rotateRoles() {
