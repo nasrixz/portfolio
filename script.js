@@ -485,6 +485,7 @@ if (contactForm) {
         }, 2000);
     });
 }
+
 // Add resize handler for responsive adjustments
 let resizeTimeout;
 window.addEventListener('resize', () => {
@@ -504,4 +505,302 @@ window.addEventListener('resize', () => {
             }
         }
     }, 250);
+});
+
+// ============================================
+// IMAGE VIEWER FUNCTIONALITY
+// ============================================
+
+let currentProject = '';
+let currentImageIndex = 0;
+let projectImages = {
+    'niagamate': [
+        {
+            src: 'images/project/niagamate/main.png',
+            title: 'Main View',
+            description: 'Show All Store'
+        },
+        {
+            src: 'images/project/niagamate/menu.png',
+            title: 'Menu View',
+            description: 'Menu for a specific restaurant'
+        },
+        {
+            src: 'images/project/niagamate/order.png',
+            title: 'Add to Cart',
+            description: 'Add items to cart and proceed to checkout'
+        },
+        {
+            src: 'images/project/niagamate/pos.png',
+            title: 'POS System',
+            description: 'Point of Sale interface for order management'
+        }
+    ],
+    'rims-prison': [
+        {
+            src: 'images/project/rims_prison/rims_p_login_page.png',
+            title: 'Login Screen',
+            description: 'Secure login for authorized personnel'
+        },
+        {
+            src: 'images/project/rims_prison/rims_p_monitoring.png',
+            title: 'Cell Monitoring',
+            description: 'Real-time monitoring of inmate cells'
+        },
+        {
+            src: 'images/project/rims_prison/rims_p_error.png',
+            title: 'Error Handling',
+            description: 'Error detection and alert system'
+        },
+        {
+            src: 'images/project/rims_prison/rims_user.png',
+            title: 'User Management',
+            description: 'User Profille and Access Control'
+        },
+
+        {
+            src: 'images/project/rims_prison/rims_p_map.png',
+            title: 'Facility Map',
+            description: 'Interactive map of the prison layout'
+        }
+    ],
+    'rims-firefighter': [
+        {
+            src: 'images/project/rims_alert/login.png',
+            title: 'Login Screen',
+            description: 'Secure login for firefighters'
+        },
+        {
+            src: 'images/project/rims_alert/rims_fire_extingusher.png',
+            title: 'Fire Extinguisher',
+            description: 'Fire extinguisher status and location'
+        },
+        {
+            src: 'images/project/rims_alert/rims_home.png',
+            title: 'Monitoring Dashboard',
+            description: 'Real-time fire and safety monitoring'
+        },
+        {
+            src: 'images/project/rims_alert/rims_report.png',
+            title: 'Reports Dashboard',
+            description: 'Reports and analytics for incidents',
+        },
+        {
+            src: 'images/project/rims_alert/rims_report_example.png',
+            title: 'Genuine Alarm Report',
+            description: 'Detailed report of a genuine fire alarm incident'
+        }
+    ]
+};
+
+// Initialize thumbnails for each project
+function initializeThumbnails() {
+    // Initialize NiagaMate thumbnails
+    const niagamateThumbnails = document.getElementById('niagamate-thumbnails');
+    if (niagamateThumbnails) {
+        projectImages['niagamate'].forEach((image, index) => {
+            const thumb = createThumbnail(image.src, index, 'niagamate');
+            niagamateThumbnails.appendChild(thumb);
+        });
+        startSlideshow('niagamate');
+    }
+
+    // Initialize RIMS Prison thumbnails
+    const rimsPrisonThumbnails = document.getElementById('rims-prison-thumbnails');
+    if (rimsPrisonThumbnails) {
+        projectImages['rims-prison'].forEach((image, index) => {
+            const thumb = createThumbnail(image.src, index, 'rims-prison');
+            rimsPrisonThumbnails.appendChild(thumb);
+        });
+        startSlideshow('rims-prison');
+    }
+
+    // Initialize RIMS Firefighter thumbnails
+    const rimsFirefighterThumbnails = document.getElementById('rims-firefighter-thumbnails');
+    if (rimsFirefighterThumbnails) {
+        projectImages['rims-firefighter'].forEach((image, index) => {
+            const thumb = createThumbnail(image.src, index, 'rims-firefighter');
+            rimsFirefighterThumbnails.appendChild(thumb);
+        });
+        startSlideshow('rims-firefighter');
+    }
+}
+
+function createThumbnail(src, index, project) {
+    const thumb = document.createElement('div');
+    thumb.className = 'ui-thumbnail';
+    if (index === 0) thumb.classList.add('active');
+    thumb.innerHTML = `<img src="${src}" alt="Thumbnail ${index + 1}">`;
+    thumb.onclick = () => openImageViewer(project, index);
+    return thumb;
+}
+
+// Slideshow functionality
+
+// Slideshow functionality
+let slideshowIntervals = {};
+
+function startSlideshow(project) {
+    let currentIndex = 0;
+    const container = document.getElementById(`${project}-thumbnails`);
+    if (!container) return;
+
+    const thumbnails = container.querySelectorAll('.ui-thumbnail');
+
+    // Find the main mockup image for this project
+    const mockupImage = container.closest('.ui-preview').querySelector('.ui-mockup img');
+
+    slideshowIntervals[project] = setInterval(() => {
+        thumbnails.forEach(thumb => thumb.classList.remove('active'));
+        currentIndex = (currentIndex + 1) % thumbnails.length;
+        thumbnails[currentIndex].classList.add('active');
+
+        // Update the main mockup image
+        if (mockupImage && projectImages[project][currentIndex]) {
+            mockupImage.src = projectImages[project][currentIndex].src;
+            mockupImage.style.opacity = '0';
+            setTimeout(() => {
+                mockupImage.style.opacity = '1';
+            }, 50);
+        }
+    }, 3000);
+}
+
+function createThumbnail(src, index, project) {
+    const thumb = document.createElement('div');
+    thumb.className = 'ui-thumbnail';
+    if (index === 0) thumb.classList.add('active');
+    thumb.innerHTML = `<img src="${src}" alt="Thumbnail ${index + 1}">`;
+
+    // Add both click handlers
+    thumb.onclick = (e) => {
+        e.stopPropagation();
+
+        // Update main mockup image immediately when thumbnail is clicked
+        const container = document.getElementById(`${project}-thumbnails`);
+        const mockupImage = container.closest('.ui-preview').querySelector('.ui-mockup img');
+        if (mockupImage) {
+            mockupImage.src = src;
+            mockupImage.style.opacity = '0';
+            setTimeout(() => {
+                mockupImage.style.opacity = '1';
+            }, 50);
+        }
+
+        // Update active state
+        container.querySelectorAll('.ui-thumbnail').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+
+        // Reset slideshow to this index
+        if (slideshowIntervals[project]) {
+            clearInterval(slideshowIntervals[project]);
+            startSlideshowFromIndex(project, index);
+        }
+
+        // Also open the viewer
+        openImageViewer(project, index);
+    };
+
+    return thumb;
+}
+
+// New function to start slideshow from specific index
+function startSlideshowFromIndex(project, startIndex) {
+    let currentIndex = startIndex;
+    const container = document.getElementById(`${project}-thumbnails`);
+    if (!container) return;
+
+    const thumbnails = container.querySelectorAll('.ui-thumbnail');
+    const mockupImage = container.closest('.ui-preview').querySelector('.ui-mockup img');
+
+    slideshowIntervals[project] = setInterval(() => {
+        thumbnails.forEach(thumb => thumb.classList.remove('active'));
+        currentIndex = (currentIndex + 1) % thumbnails.length;
+        thumbnails[currentIndex].classList.add('active');
+
+        // Update the main mockup image
+        if (mockupImage && projectImages[project][currentIndex]) {
+            mockupImage.src = projectImages[project][currentIndex].src;
+            mockupImage.style.opacity = '0';
+            setTimeout(() => {
+                mockupImage.style.opacity = '1';
+            }, 50);
+        }
+    }, 3000);
+}
+// Image Viewer functions
+window.openImageViewer = function (project, index) {
+    currentProject = project;
+    currentImageIndex = index;
+    const modal = document.getElementById('imageViewerModal');
+    modal.classList.add('show');
+
+    updateViewerImage();
+    createViewerThumbnails();
+}
+
+window.closeImageViewer = function () {
+    const modal = document.getElementById('imageViewerModal');
+    modal.classList.remove('show');
+}
+
+window.changeImage = function (direction) {
+    const images = projectImages[currentProject];
+    currentImageIndex = (currentImageIndex + direction + images.length) % images.length;
+    updateViewerImage();
+}
+
+function updateViewerImage() {
+    const images = projectImages[currentProject];
+    const currentImage = images[currentImageIndex];
+
+    document.getElementById('viewerImage').src = currentImage.src;
+    document.getElementById('viewerTitle').textContent = currentImage.title;
+    document.getElementById('viewerDescription').textContent = currentImage.description;
+
+    // Update active thumbnail
+    const thumbnails = document.querySelectorAll('.viewer-thumbnail');
+    thumbnails.forEach((thumb, index) => {
+        thumb.classList.toggle('active', index === currentImageIndex);
+    });
+}
+
+
+
+// Keyboard navigation for image viewer
+document.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('imageViewerModal');
+    if (modal && modal.classList.contains('show')) {
+        if (e.key === 'ArrowLeft') changeImage(-1);
+        if (e.key === 'ArrowRight') changeImage(1);
+        if (e.key === 'Escape') closeImageViewer();
+    }
+});
+
+// Initialize thumbnails when DOM is loaded
+// Initialize thumbnails when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initializeThumbnails();
+
+    // Stop slideshow when hovering over thumbnails
+    document.querySelectorAll('.thumbnail-container').forEach(container => {
+        const project = container.id.replace('-thumbnails', '');
+        let pausedIndex = 0;
+
+        container.addEventListener('mouseenter', () => {
+            if (slideshowIntervals[project]) {
+                clearInterval(slideshowIntervals[project]);
+
+                // Get current active index
+                const activeThumb = container.querySelector('.ui-thumbnail.active');
+                const allThumbs = container.querySelectorAll('.ui-thumbnail');
+                pausedIndex = Array.from(allThumbs).indexOf(activeThumb);
+            }
+        });
+
+        container.addEventListener('mouseleave', () => {
+            // Resume from the paused index
+            startSlideshowFromIndex(project, pausedIndex);
+        });
+    });
 });
