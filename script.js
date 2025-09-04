@@ -636,7 +636,6 @@ function createThumbnail(src, index, project) {
 }
 
 // Slideshow functionality
-
 // Slideshow functionality
 let slideshowIntervals = {};
 
@@ -728,6 +727,7 @@ function startSlideshowFromIndex(project, startIndex) {
         }
     }, 3000);
 }
+
 // Image Viewer functions
 window.openImageViewer = function (project, index) {
     currentProject = project;
@@ -765,7 +765,22 @@ function updateViewerImage() {
     });
 }
 
+function createViewerThumbnails() {
+    const container = document.getElementById('viewerThumbnails');
+    container.innerHTML = '';
 
+    projectImages[currentProject].forEach((image, index) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'viewer-thumbnail';
+        if (index === currentImageIndex) thumb.classList.add('active');
+        thumb.innerHTML = `<img src="${image.src}" alt="${image.title}">`;
+        thumb.onclick = () => {
+            currentImageIndex = index;
+            updateViewerImage();
+        };
+        container.appendChild(thumb);
+    });
+}
 
 // Keyboard navigation for image viewer
 document.addEventListener('keydown', (e) => {
